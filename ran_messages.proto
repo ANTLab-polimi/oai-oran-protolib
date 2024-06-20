@@ -7,26 +7,29 @@ enum RAN_message_type{
     CONTROL = 4;
 } 
 
-enum RAN_parameter{
+enum RAN_parameter{   //the parameters of the gNB
     GNB_ID = 1;
     UE_LIST = 3;
+    BER = 5; //  (1) new parameter for BER
 }
 
-message RAN_param_map_entry{
-    required RAN_parameter key = 1;
-    oneof value{
+message RAN_param_map_entry{      //map: collection of keys and values
+    required RAN_parameter key = 1;    //key: name of a parameter that the xApp requested
+    oneof value{                       //value of the parameter
         int64 int64_value  = 2;
         string string_value = 3;
         ue_list_m ue_list = 4;
+        float ber_value = 5;    // (2) new field for BER value
     }
 }
 
 /* RAN SUBMESSAGES */
 message RAN_indication_request{
     repeated RAN_parameter target_params = 1;
+    optional bool send_ber_flag = 2;   // (3) new flag to send BER
 }
 
-message RAN_indication_response{
+message RAN_indication_response{   //response of the gNB
     repeated RAN_param_map_entry param_map = 1;
 }
 
@@ -39,16 +42,16 @@ message RAN_control_request{
 message RAN_message{
     required RAN_message_type msg_type = 1;
     oneof payload{
-        RAN_indication_request ran_indication_request = 2;
-        RAN_indication_response ran_indication_response = 3;
-        RAN_control_request ran_control_request = 4;
+        RAN_indication_request ran_indication_request = 2;  //the xApp asks the gNB to report on some of its parameters
+        RAN_indication_response ran_indication_response = 3;  //the answer of the gNB
+        RAN_control_request ran_control_request = 4;  //message sent to the xApp to control the parameter of the gNB
     }
 }
 
 message ue_info_m{
 
     // this is to identify the ue
-    required int32 rnti=1;
+    required int32 rnti=1;     //rnti: UE's radio network temporary identifier
 
     // specific ue's measurements (these will come from the gnb)
     optional float meas_type_1=2;
